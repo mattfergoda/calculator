@@ -1,0 +1,38 @@
+#calculator {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 75px repeat(4, auto);
+    height: 400px;
+    width: 400px;
+    margin: auto;
+    border-style: solid;
+    border-width: 10px;
+    border-radius: 3%;
+    column-gap: 0px;
+    row-gap: 0px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#return {
+    font-size: 40px;
+}
+
+
+.button {
+    font-size: 32px;
+    margin: auto;
+    cursor: pointer;
+}
+
+.button:hover {
+    color: gray;
+}
+
+#return {
+    grid-column: 1 / 4;
+}
+
+#equals {
+    grid-column: 3 /4;
+    grid-row: 5 / 8;
+}
