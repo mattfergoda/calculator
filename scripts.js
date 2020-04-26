@@ -42,14 +42,21 @@ function operate(operator, numA, numB) {
     if (numA.length == 0) {
         return [0];
     }
+
+    // User repeatedly pressing operator but hasn't entered num2.
+    else if (numB.length == 0 && operatorPressed == true) {
+        return numA;
+    }
     // User repeatedly pressing equals to repeat previous operation
     // on new display output.
     else if (numB.length == 0 && equalsPressed && lastNum2.length != 0) {
         return operate(lastOperator, num1, lastNum2);
+        
     }
     // User repeatedly pressing equals to repeat operation
     // but no num2 has been entered in this session.
     else if (numB.length == 0 && equalsPressed && lastNum2.length == 0) {
+        console.log('here');
         return numA;
     }
     // Perform normal operation.
@@ -76,28 +83,53 @@ function operate(operator, numA, numB) {
 }
 
 function updateDisplay(num) {
-    document.querySelector("#return").textContent = num.join("");
+    num = Number(num.join(""));
+    num = +num.toFixed(12);
+    document.querySelector("#return").textContent = num;
+}
+
+function switchSign(num) {
+    num = (-1) * Number(num.join(""));
+    return String(num).split("");
 }
 
 function addNumberListeners() {
     let nums = document.querySelectorAll('.number');
     for (let i = 0; i < nums.length; i++) {
         nums[i].addEventListener('click', (e) => {
+            let num = nums[i].textContent;
             // Entering num1
             if (!operatorPressed && !equalsPressed) {
-                num1.push(nums[i].textContent);
-                updateDisplay(num1);
+                if (num == "+/-") {
+                    num1 = switchSign(num1);
+                }
+                else {
+                    num1.push(num);
+                }
+                updateDisplay(num1)
             }
             // Entering num2 after hitting operator before hitting equals.
             else if (num1.length != 0 && operatorPressed && !equalsPressed) {
-                num2.push(nums[i].textContent);
+                if (num == "+/-") {
+                    num2 = switchSign(num2);
+                }
+                else {
+                    num2.push(num);
+                }
                 updateDisplay(num2);
             }
             // Entering num2 after hitting equals.
             else if (equalsPressed) {
-                num2.push(nums[i].textContent);
-                updateDisplay(num2);
-                equalsPressed = false;
+                if (num == "+/-") {
+                    num1 = switchSign(num1);
+                    updateDisplay(num1);
+                }
+                else {
+                    num2.push(num); 
+                    updateDisplay(num2);
+                    equalsPressed = false;
+                }
+                
             }
         });
     }
@@ -108,6 +140,8 @@ function addClearListener() {
     clearButton.addEventListener('click', (e) => {
         num1 = [];
         num2 = [];
+        lastNum2 = [];
+        lastOperator = null;
         operatorPressed = false;
         equalsPressed = false;
         updateDisplay([0]);
@@ -117,9 +151,9 @@ function addClearListener() {
 function addEqualsListener() {
     let equalsButton = document.querySelector('#equals');
     equalsButton.addEventListener('click', (e) => {
+        equalsPressed = true;
         num1 = operate(operator, num1, num2)
         updateDisplay(num1);
-        equalsPressed = true;
         operatorPressed = false;
         lastOperator = operator;
 
