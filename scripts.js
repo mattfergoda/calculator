@@ -56,7 +56,6 @@ function operate(operator, numA, numB) {
     // User repeatedly pressing equals to repeat operation
     // but no num2 has been entered in this session.
     else if (numB.length == 0 && equalsPressed && lastNum2.length == 0) {
-        console.log('here');
         return numA;
     }
     // Perform normal operation.
@@ -103,6 +102,9 @@ function addNumberListeners() {
                 if (num == "+/-") {
                     num1 = switchSign(num1);
                 }
+                else if (num == "<-") {
+                    num1.pop();
+                }
                 else {
                     num1.push(num);
                 }
@@ -112,6 +114,9 @@ function addNumberListeners() {
             else if (num1.length != 0 && operatorPressed && !equalsPressed) {
                 if (num == "+/-") {
                     num2 = switchSign(num2);
+                }
+                else if (num == "<-") {
+                    num2.pop();
                 }
                 else {
                     num2.push(num);
@@ -123,6 +128,9 @@ function addNumberListeners() {
                 if (num == "+/-") {
                     num1 = switchSign(num1);
                     updateDisplay(num1);
+                }
+                else if (num == "<-") {
+                    return;
                 }
                 else {
                     num2.push(num); 
