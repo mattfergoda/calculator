@@ -1,11 +1,21 @@
-let num1 = 0;
-let num2;
+// Vars for storing numbers and operators entered by user.
+// Using arrays for numbers to more easily handle user input.
+let num1 = [];
+let num2 = [];
 let operator;
-let operatorPressed = false;
-let equalsPressed = false;
+
+// Vars for storing previous operator and number entered by user.
+// Used to handle user repeatedly pressing equals to repeat calculation.
+let lastOperator;
+let lastNum2 = [];
+
+// Bools for handling strings of operations and storing output of
+// previous calculations for next calculation.
+let operatorPressed;
+let equalsPressed;
 
 function add(numA, numB) {
-    return Number(numA) + Number(numB);
+    return numA + numB;
 }
 
 function subtract(numA, numB) {
@@ -18,7 +28,7 @@ function multiply(numA, numB) {
 
 function divide(numA, numB) {
     if (numB == 0) {
-        return "No division by zero.";
+        return "Err";
     }
     else {
         return numA / numB;
@@ -26,68 +36,68 @@ function divide(numA, numB) {
 }
 
 function operate(operator, numA, numB) {
-    let result;
-    if (operator == "add") {
-        result = add(numA, numB);
+    // Handle some edge cases first:
+
+    // Nothing entered yet and user is trying to operate.
+    if (numA.length == 0) {
+        return [0];
     }
-    else if (operator == "subtract") {
-        result = subtract(numA, numB);
+    // User repeatedly pressing equals to repeat previous operation
+    // on new display output.
+    else if (numB.length == 0 && equalsPressed && lastNum2.length != 0) {
+        return operate(lastOperator, num1, lastNum2);
     }
-    else if (operator == "multiply") {
-        result = multiply(numA, numB);
+    // User repeatedly pressing equals to repeat operation
+    // but no num2 has been entered in this session.
+    else if (numB.length == 0 && equalsPressed && lastNum2.length == 0) {
+        return numA;
     }
-    else if (operator == "divide") {
-        result = divide(numA, numB);
-    }
-    console.log(`the result is ${result}`);
-    return result;
+    // Perform normal operation.
+    else {
+        let result;
+        numA = Number(numA.join(""));
+        numB = Number(numB.join(""));
+        if (operator == "+") {
+            result = add(numA, numB);
+        }
+        else if (operator == "-") {
+            result = subtract(numA, numB);
+        }
+        else if (operator == "x") {
+            result = multiply(numA, numB);
+        }
+        else if (operator == "/") {
+            result = divide(numA, numB);
+        }
+        
+        // Return result as array of numbers.
+        return String(result).split("");
+    }  
+}
+
+function updateDisplay(num) {
+    document.querySelector("#return").textContent = num.join("");
 }
 
 function addNumberListeners() {
     let nums = document.querySelectorAll('.number');
     for (let i = 0; i < nums.length; i++) {
         nums[i].addEventListener('click', (e) => {
-            if (!num1 && !operatorPressed) {
-                num1 = nums[i].textContent;
-                console.log("changing num1 1");
-                document.querySelector("#return").textContent = num1;
+            // Entering num1
+            if (!operatorPressed && !equalsPressed) {
+                num1.push(nums[i].textContent);
+                updateDisplay(num1);
             }
-
-            else if (num1 && !operatorPressed && !equalsPressed && !num2) {
-                num1 = num1 + String(nums[i].textContent);
-                console.log("changing num1 2");
-                document.querySelector("#return").textContent = num1;
+            // Entering num2 after hitting operator before hitting equals.
+            else if (num1.length != 0 && operatorPressed && !equalsPressed) {
+                num2.push(nums[i].textContent);
+                updateDisplay(num2);
             }
-            
-            else if (num1 && equalsPressed && !operatorPressed && !num2) {
-                num1 = nums[i].textContent;
-                console.log("changing num1 3");
-                document.querySelector("#return").textContent = num2;
+            // Entering num2 after hitting equals.
+            else if (equalsPressed) {
+                num2.push(nums[i].textContent);
+                updateDisplay(num2);
                 equalsPressed = false;
-            }
-            
-            else if (num1 && !num2 && operatorPressed && !equalsPressed) {
-                num2 = nums[i].textContent;
-                console.log("changing num2 1");
-                document.querySelector("#return").textContent = num2;
-            }
-
-            else if (num1 && num2 && operatorPressed && !equalsPressed) {
-                num2 = num2 + String(nums[i].textContent);
-                console.log("changing num2 2");
-                document.querySelector("#return").textContent = num2;
-            }
-
-            else if (equalsPressed && operatorPressed && !num2) {
-                num2 = nums[i].textContent;
-                console.log("changing num2 3");
-                document.querySelector("#return").textContent = num2;
-            } 
-
-            else if (equalsPressed && operatorPressed && num2) {
-                num2 = num2 + String(nums[i].textContent);
-                console.log("changing num2 4");
-                document.querySelector("#return").textContent = num2;
             }
         });
     }
@@ -96,11 +106,11 @@ function addNumberListeners() {
 function addClearListener() {
     let clearButton = document.querySelector('#clear');
     clearButton.addEventListener('click', (e) => {
-        num1 = null;
-        num2 = null;
+        num1 = [];
+        num2 = [];
         operatorPressed = false;
         equalsPressed = false;
-        document.querySelector("#return").textContent = 0;
+        updateDisplay([0]);
     });
 }
 
@@ -108,68 +118,46 @@ function addEqualsListener() {
     let equalsButton = document.querySelector('#equals');
     equalsButton.addEventListener('click', (e) => {
         num1 = operate(operator, num1, num2)
-        document.querySelector("#return").textContent = num1;
-        num2 = null;
+        updateDisplay(num1);
         equalsPressed = true;
+        operatorPressed = false;
+        lastOperator = operator;
+
+        // Handles updating num2 in cases where user keeps 
+        // hitting equals to repeat the operator.
+        if (num2.length == 0) {
+            // User is repeating operation, don't want to update num2.
+            return;
+        }
+        else {
+            // User has updated num2 prior to hitting equals.
+            // Update lastNum2 and clear num2.
+            lastNum2 = num2;
+            num2 = [];
+        }
     });
 }
 
 function addOperatorListeners() {
-    let addButton = document.querySelector('#plus');
-    addButton.addEventListener('click', (e) => {
-        if (operatorPressed) {
-            num1 = operate(operator, num1, num2);
-            num2 = null;
-            operator = "add";
-            document.querySelector("#return").textContent = num1;
-        }
-        else {
-            operator = "add";
-            operatorPressed = true;
-        }
-    })
-
-    let subtractButton = document.querySelector('#minus');
-    subtractButton.addEventListener('click', (e) => {
-        if (operatorPressed) {
-            num1 = operate(operator, num1, num2);
-            num2 = null;
-            operator = "subtract";
-            document.querySelector("#return").textContent = num1;
-        }
-        else {
-            operator = "subtract";
-            operatorPressed = true;
-        }
-    })
-
-    let multiplyButton = document.querySelector('#times');
-    multiplyButton.addEventListener('click', (e) => {
-        if (operatorPressed) {
-            num1 = operate(operator, num1, num2);
-            num2 = null;
-            operator = "multiply";
-            document.querySelector("#return").textContent = num1;
-        }
-        else {
-            operator = "multiply";
-            operatorPressed = true;
-        }
-    })
-
-    let divideButton = document.querySelector('#divide');
-    divideButton.addEventListener('click', (e) => {
-        if (operatorPressed) {
-            num1 = operate(operator, num1, num2);
-            num2 = null;
-            operator = "divide";
-            document.querySelector("#return").textContent = num1;
-        }
-        else {
-            operator = "divide";
-            operatorPressed = true;
-        }
-    })
+    let operators = document.querySelectorAll(".operator");
+    for (let i = 0; i < operators.length; i++) {
+        operators[i].addEventListener('click', (e) => {
+            // If user is entering chain of operations, update
+            // display value based on previous operator when
+            // new operator is pressed.
+            if (operatorPressed) {
+                num1 = operate(operator, num1, num2);
+                num2 = []
+                updateDisplay(num1);
+            }
+            // Otherwise, user will enter in second number and display
+            // won't update yet.
+            else {
+                operatorPressed = true;
+            }
+            operator = operators[i].textContent;
+        });
+    }
 }
 
 function addEventListeners() {    
