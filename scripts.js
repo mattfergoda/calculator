@@ -1,13 +1,12 @@
 // Vars for storing numbers and operators entered by user.
-// Using arrays for numbers to more easily handle user input.
-let num1 = [];
-let num2 = [];
+let num1 = "";
+let num2 = "";
 let operator;
 
 // Vars for storing previous operator and number entered by user.
 // Used to handle user repeatedly pressing equals to repeat calculation.
 let lastOperator;
-let lastNum2 = [];
+let lastNum2 = "";
 
 // Bools for handling strings of operations and storing output of
 // previous calculations for next calculation.
@@ -61,8 +60,8 @@ function operate(operator, numA, numB) {
     // Perform normal operation.
     else {
         let result;
-        numA = Number(numA.join(""));
-        numB = Number(numB.join(""));
+        numA = Number(numA);
+        numB = Number(numB);
         if (operator == "+") {
             result = add(numA, numB);
         }
@@ -77,94 +76,137 @@ function operate(operator, numA, numB) {
         }
         
         // Return result as array of numbers.
-        return String(result).split("");
+        return String(result);
     }  
 }
 
 function updateDisplay(num) {
-    num = Number(num.join(""));
-    num = +num.toFixed(12);
-    document.querySelector("#return").textContent = num;
+    // Round only if display shows a number.
+    if (num == 'Err') {
+        document.querySelector("#return").textContent = num;
+    }
+    else {
+        num = Number(num);
+        num = +num.toFixed(12);
+        document.querySelector("#return").textContent = num;
+    }
 }
 
 function switchSign(num) {
-    num = (-1) * Number(num.join(""));
-    return String(num).split("");
+    num = (-1) * Number(num);
+    return String(num);
+}
+
+function storeNum1(num) {
+    if (num == "+/-") {
+        num1 = switchSign(num1);
+    }
+    else if (num == "<-") {
+        num1 = num1.slice(0, -1);
+    }
+    else {
+        num1 += String(num);
+    }
+    updateDisplay(num1)
+}
+
+function storeNum2(num) {
+    if (num == "+/-") {
+        num2 = switchSign(num2);
+    }
+    else if (num == "<-") {
+        num2 = num2.slice(0, -1);
+    }
+    else {
+        num2 += String(num);
+    }
+    updateDisplay(num2)
+}
+
+function storeNumAfterEquals(num) {
+    if (num == "+/-") {
+        num1 = switchSign(num1);
+        updateDisplay(num1);
+    }
+    else if (num == "<-") {
+        return;
+    }
+    else {
+        num2 += String(num); 
+        updateDisplay(num2);
+        equalsPressed = false;
+    }
 }
 
 function addNumberListeners() {
     let nums = document.querySelectorAll('.number');
+
+    // Treating +/- and <- as numbers since their behavior is more
+    // like a number than an operator.
     for (let i = 0; i < nums.length; i++) {
         nums[i].addEventListener('click', (e) => {
             let num = nums[i].textContent;
-            // Entering num1
+            // Entering num1.
             if (!operatorPressed && !equalsPressed) {
-                if (num == "+/-") {
-                    num1 = switchSign(num1);
-                }
-                else if (num == "<-") {
-                    num1.pop();
-                }
-                else {
-                    num1.push(num);
-                }
-                updateDisplay(num1)
+                storeNum1(num);
             }
             // Entering num2 after hitting operator before hitting equals.
-            else if (num1.length != 0 && operatorPressed && !equalsPressed) {
-                if (num == "+/-") {
-                    num2 = switchSign(num2);
-                }
-                else if (num == "<-") {
-                    num2.pop();
-                }
-                else {
-                    num2.push(num);
-                }
-                updateDisplay(num2);
+            else if (!equalsPressed && operatorPressed) {
+                storeNum2(num);
+            }
+            // Entering num1 after hitting equals.
+            else if (equalsPressed && !operatorPressed) {
+                clear();
+                storeNum1(num);    
             }
             // Entering num2 after hitting equals.
-            else if (equalsPressed) {
-                if (num == "+/-") {
-                    num1 = switchSign(num1);
-                    updateDisplay(num1);
-                }
-                else if (num == "<-") {
-                    return;
-                }
-                else {
-                    num2.push(num); 
-                    updateDisplay(num2);
-                    equalsPressed = false;
-                }
-                
+            else if (equalsPressed && operatorPressed) {
+                storeNumAfterEquals(num);
             }
         });
     }
 }
 
+function clear() {
+    num1 = "";
+    num2 = "";
+    lastNum2 = "";
+    lastOperator = null;
+    operatorPressed = false;
+    equalsPressed = false;
+}
+
 function addClearListener() {
     let clearButton = document.querySelector('#clear');
     clearButton.addEventListener('click', (e) => {
-        num1 = [];
-        num2 = [];
-        lastNum2 = [];
-        lastOperator = null;
-        operatorPressed = false;
-        equalsPressed = false;
+        clear();
         updateDisplay([0]);
     });
+}
+
+function checkErr() {
+    if (num1 == "Err") {
+        updateDisplay(num1);
+        clear();
+        return true;
+    }
+    else {
+        return false;
+    }
 }
 
 function addEqualsListener() {
     let equalsButton = document.querySelector('#equals');
     equalsButton.addEventListener('click', (e) => {
         equalsPressed = true;
-        num1 = operate(operator, num1, num2)
-        updateDisplay(num1);
-        operatorPressed = false;
-        lastOperator = operator;
-
+        num1 = operate(operator, num1, num2);
+        let err = checkErr();
+    
+        if (!err) {
+            updateDisplay(num1);
+            operatorPressed = false;
+            lastOperator = operator;
+        } 
         // Handles updating num2 in cases where user keeps 
         // hitting equals to repeat the operator.
         if (num2.length == 0) {
@@ -189,8 +231,12 @@ function addOperatorListeners() {
             // new operator is pressed.
             if (operatorPressed) {
                 num1 = operate(operator, num1, num2);
-                num2 = []
-                updateDisplay(num1);
+                let err = checkErr();
+
+                if (!err) {
+                    num2 = []
+                    updateDisplay(num1);
+                }
             }
             // Otherwise, user will enter in second number and display
             // won't update yet.
