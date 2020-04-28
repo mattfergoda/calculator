@@ -39,7 +39,7 @@ function operate(operator, numA, numB) {
 
     // Nothing entered yet and user is trying to operate.
     if (numA.length == 0) {
-        return [0];
+        return "";
     }
 
     // User repeatedly pressing operator but hasn't entered num2.
@@ -57,9 +57,9 @@ function operate(operator, numA, numB) {
     else if (numB.length == 0 && equalsPressed && lastNum2.length == 0) {
         return numA;
     }
+
     // Perform normal operation.
     else {
-        let result;
         numA = Number(numA);
         numB = Number(numB);
         if (operator == "+") {
@@ -74,21 +74,7 @@ function operate(operator, numA, numB) {
         else if (operator == "/") {
             result = divide(numA, numB);
         }
-        
-        // Return result as array of numbers.
-        return String(result);
-    }  
-}
-
-function updateDisplay(num) {
-    // Round only if display shows a number.
-    if (num == 'Err') {
-        document.querySelector("#return").textContent = num;
-    }
-    else {
-        num = Number(num);
-        num = +num.toFixed(12);
-        document.querySelector("#return").textContent = num;
+        return String(result); 
     }
 }
 
@@ -97,6 +83,9 @@ function switchSign(num) {
     return String(num);
 }
 
+function updateDisplay(num) {
+    document.querySelector("#return").textContent = num;
+}
 function storeNum1(num) {
     if (num == "+/-") {
         num1 = switchSign(num1);
@@ -104,7 +93,11 @@ function storeNum1(num) {
     else if (num == "<-") {
         num1 = num1.slice(0, -1);
     }
+    else if (num == "." && !num1.includes('.')) {
+        num1 += String(num);
+    }
     else {
+        console.log("concat string");
         num1 += String(num);
     }
     updateDisplay(num1)
@@ -113,9 +106,17 @@ function storeNum1(num) {
 function storeNum2(num) {
     if (num == "+/-") {
         num2 = switchSign(num2);
+        updateDisplay(num2);
+        return;
+    }
+    else if (num == "+/-" && !num2) {
+        num2 = switchSign(num2);
     }
     else if (num == "<-") {
         num2 = num2.slice(0, -1);
+    }
+    else if (num == "." && !num2.includes('.')) {
+        num2 += String(num);
     }
     else {
         num2 += String(num);
@@ -129,9 +130,12 @@ function storeNumAfterEquals(num) {
         updateDisplay(num1);
     }
     else if (num == "<-") {
-        return;
+        
     }
-    else {
+    else if (num == "." && !num2.includes('.')) {
+        num2 += String(num);
+    }
+    else if (num != ".") {
         num2 += String(num); 
         updateDisplay(num2);
         equalsPressed = false;
@@ -146,6 +150,7 @@ function addNumberListeners() {
     for (let i = 0; i < nums.length; i++) {
         nums[i].addEventListener('click', (e) => {
             let num = nums[i].textContent;
+            
             // Entering num1.
             if (!operatorPressed && !equalsPressed) {
                 storeNum1(num);
@@ -156,7 +161,9 @@ function addNumberListeners() {
             }
             // Entering num1 after hitting equals.
             else if (equalsPressed && !operatorPressed) {
-                clear();
+                if (num != "+/-") {
+                    clear(); 
+                }
                 storeNum1(num);    
             }
             // Entering num2 after hitting equals.
@@ -171,7 +178,7 @@ function clear() {
     num1 = "";
     num2 = "";
     lastNum2 = "";
-    lastOperator = null;
+    lastOperator = "";
     operatorPressed = false;
     equalsPressed = false;
 }
@@ -180,7 +187,7 @@ function addClearListener() {
     let clearButton = document.querySelector('#clear');
     clearButton.addEventListener('click', (e) => {
         clear();
-        updateDisplay([0]);
+        updateDisplay("");
     });
 }
 
@@ -198,26 +205,27 @@ function checkErr() {
 function addEqualsListener() {
     let equalsButton = document.querySelector('#equals');
     equalsButton.addEventListener('click', (e) => {
-        equalsPressed = true;
-        num1 = operate(operator, num1, num2);
-        let err = checkErr();
-    
-        if (!err) {
+
+        if (String(num1) != "") {
+            equalsPressed = true;
+            num1 = operate(operator, num1, num2);
+
+            let err = checkErr();
+            if (!err) {
+            num1 = Math.round(num1 * 1e15) / 1e15;
             updateDisplay(num1);
             operatorPressed = false;
             lastOperator = operator;
-        } 
-        // Handles updating num2 in cases where user keeps 
-        // hitting equals to repeat the operator.
-        if (num2.length == 0) {
-            // User is repeating operation, don't want to update num2.
-            return;
-        }
-        else {
-            // User has updated num2 prior to hitting equals.
-            // Update lastNum2 and clear num2.
-            lastNum2 = num2;
-            num2 = [];
+            } 
+            // Handles updating num2 in cases where user keeps 
+            // hitting equals to repeat the operator.
+            
+            if (num2.length !=0) {
+                // User has updated num2 prior to hitting equals. 
+                // Store old num2 in case they hit equals again.
+                lastNum2 = num2;
+                num2 = "";
+            }
         }
     });
 }
@@ -229,12 +237,13 @@ function addOperatorListeners() {
             // If user is entering chain of operations, update
             // display value based on previous operator when
             // new operator is pressed.
-            if (operatorPressed) {
+            if (operatorPressed && String(num1) != "") {
                 num1 = operate(operator, num1, num2);
+                
                 let err = checkErr();
-
                 if (!err) {
-                    num2 = []
+                    num1 = Math.round(num1 * 1e15) / 1e15;
+                    num2 = "";
                     updateDisplay(num1);
                 }
             }

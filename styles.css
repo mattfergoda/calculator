@@ -1,17 +1,20 @@
 body {
-    background-color: rgb(182, 253, 222);
+    background-color: rgb(233, 233, 233);
 }
 #calculator {
     display: grid;
     align-items: stretch;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: 75px repeat(4, auto);
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 75px repeat(5, auto);
     gap: 0px 0px;
     height: 450px;
     width: 475px;
     margin: auto;
     font-family: Ubuntu Mono;
-    color: lightblue;
+    color: rgb(119, 201, 228);
+    border-style: solid;
+    border-radius: 2%;
+    border-color :gray;
 }
 
 .item {
@@ -27,7 +30,8 @@ body {
 #return {
     font-size: 40px;
     color: black;
-    background-color: whitesmoke
+    background-color: whitesmoke;
+    grid-column: 1 / 5;
 }
 
 
@@ -44,26 +48,17 @@ body {
     color: gray;
 }
 
-#return {
-    grid-column: 1 / 4;
-}
-
 #equals {
-    grid-column: 3 /4;
-    grid-row: 7 / 8;
+    grid-column: 3 /5;
+    grid-row: 6 / 7;
     font-size: 40px;
+    color: whitesmoke;
 }
 
-#clear {
-    grid-column: 3 / 4;
-    grid-row: 6 / 7;
-}
 #minus {
     font-size: 40px;
 }
 
-
-
 .operator {
-    color: lightgoldenrodyellow;
+    color: rgb(255, 112, 255);
 }
