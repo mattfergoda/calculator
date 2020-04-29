@@ -147,7 +147,7 @@ function storeNumAfterEquals(num) {
 function addNumberListeners() {
     let nums = document.querySelectorAll('.number');
 
-    // Treating +/- and <- as numbers since their behavior is more
+    // Treating +/- , <-, and . as numbers since their behavior is more
     // like a number than an operator.
     for (let i = 0; i < nums.length; i++) {
         nums[i].addEventListener('click', (e) => {
