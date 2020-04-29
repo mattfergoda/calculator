@@ -144,6 +144,12 @@ function storeNumAfterEquals(num) {
     }
 }
 
+function resetOperatorColors() {
+    let operators = document.querySelectorAll(".operator");
+    for (let i = 0; i < operators.length; i++) {
+        operators[i].style.color = "rgb(255, 112, 255)"; 
+    }
+}
 function addNumberListeners() {
     let nums = document.querySelectorAll('.number');
 
@@ -160,6 +166,7 @@ function addNumberListeners() {
             // Entering num2 after hitting operator before hitting equals.
             else if (!equalsPressed && operatorPressed) {
                 storeNum2(num);
+                resetOperatorColors();
             }
             // Entering num1 after hitting equals.
             else if (equalsPressed && !operatorPressed) {
@@ -171,6 +178,7 @@ function addNumberListeners() {
             // Entering num2 after hitting equals.
             else if (equalsPressed && operatorPressed) {
                 storeNumAfterEquals(num);
+                resetOperatorColors();
             }
         });
     }
@@ -255,6 +263,7 @@ function addOperatorListeners() {
                 operatorPressed = true;
             }
             operator = operators[i].textContent;
+            operators[i].style.color = "gray";
         });
     }
 }
