@@ -1,5 +1,6 @@
 body {
-    background-color: rgb(233, 233, 233);
+    background-color: rgb(216, 214, 214);
+    margin-top: 50px;
 }
 #calculator {
     display: grid;
@@ -13,7 +14,7 @@ body {
     font-family: Ubuntu Mono;
     color: rgb(119, 201, 228);
     border-style: solid;
-    border-radius: 2%;
+    border-radius: 1%;
     border-color :gray;
 }
 
