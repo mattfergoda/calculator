@@ -96,7 +96,7 @@ function storeNum1(num) {
     else if (num == "." && !num1.includes('.')) {
         num1 += String(num);
     }
-    else {
+    else if (num != ".") {
         console.log("concat string");
         num1 += String(num);
     }
@@ -118,7 +118,7 @@ function storeNum2(num) {
     else if (num == "." && !num2.includes('.')) {
         num2 += String(num);
     }
-    else {
+    else if (num != ".") {
         num2 += String(num);
     }
     updateDisplay(num2)
@@ -134,6 +134,8 @@ function storeNumAfterEquals(num) {
     }
     else if (num == "." && !num2.includes('.')) {
         num2 += String(num);
+        updateDisplay(num2);
+        equalsPressed = false;
     }
     else if (num != ".") {
         num2 += String(num); 
