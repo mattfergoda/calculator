@@ -177,7 +177,7 @@ function addNumberListeners() {
                 storeNum1(num);    
             }
             // Entering num2 after hitting equals.
-            else if (equalsPressed && operatorPressed) {
+            else if (equalsPressed && operatorPressed && num2.length < MAX_LENGTH) {
                 storeNumAfterEquals(num);
                 resetOperatorColors();
             }
