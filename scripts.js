@@ -158,18 +158,19 @@ function addNumberListeners() {
     for (let i = 0; i < nums.length; i++) {
         nums[i].addEventListener('click', (e) => {
             let num = nums[i].textContent;
-            
+            let MAX_LENGTH = 22;
+
             // Entering num1.
-            if (!operatorPressed && !equalsPressed) {
+            if (!operatorPressed && !equalsPressed && num1.length < MAX_LENGTH) {
                 storeNum1(num);
             }
             // Entering num2 after hitting operator before hitting equals.
-            else if (!equalsPressed && operatorPressed) {
+            else if (!equalsPressed && operatorPressed && num2.length < MAX_LENGTH) {
                 storeNum2(num);
                 resetOperatorColors();
             }
             // Entering num1 after hitting equals.
-            else if (equalsPressed && !operatorPressed) {
+            else if (equalsPressed && !operatorPressed && num1.length < MAX_LENGTH) {
                 if (num != "+/-") {
                     clear(); 
                 }
