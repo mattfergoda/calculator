@@ -15,7 +15,7 @@ body {
     color: rgb(119, 201, 228);
     border-style: solid;
     border-radius: 1%;
-    border-color :gray;
+    border-color:gray;
 }
 
 .item {
@@ -41,12 +41,12 @@ body {
     cursor: pointer;
 }
 
-.other {
-    color: lightsalmon;
+.button:hover {
+  color: gray;
 }
 
-.button:hover {
-    color: gray;
+.other {
+    color: lightsalmon;
 }
 
 .equals {
