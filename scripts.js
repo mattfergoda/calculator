@@ -147,7 +147,7 @@ function storeNumAfterEquals(num) {
 function resetOperatorColors() {
     let operators = document.querySelectorAll(".operator");
     for (let i = 0; i < operators.length; i++) {
-        operators[i].style.color = "rgb(255, 112, 255)"; 
+        operators[i].style.color = "";
     }
 }
 function addNumberListeners() {
@@ -228,10 +228,10 @@ function addEqualsListener() {
 
             let err = checkErr();
             if (!err) {
-            num1 = String(Math.round(num1 * 1e15) / 1e15);
-            updateDisplay(num1);
-            operatorPressed = false;
-            lastOperator = operator;
+                num1 = String(Math.round(num1 * 1e15) / 1e15);
+                updateDisplay(num1);
+                operatorPressed = false;
+                lastOperator = operator;
             } 
             // Handles updating num2 in cases where user keeps 
             // hitting equals to repeat the operator.
@@ -248,8 +248,14 @@ function addEqualsListener() {
 
 function addOperatorListeners() {
     let operators = document.querySelectorAll(".operator");
+    
     for (let i = 0; i < operators.length; i++) {
         operators[i].addEventListener('click', (e) => {
+
+            // Clear any existing gray color operators, in case 
+            // this is the second operator the user is pressing in a row.
+            resetOperatorColors();
+
             // If user is entering chain of operations, update
             // display value based on previous operator when
             // new operator is pressed.
