@@ -160,17 +160,21 @@ function addNumberListeners() {
             let num = nums[i].textContent;
             let MAX_LENGTH = 22;
 
+            console.log(operatorPressed)
             // Entering num1.
             if (!operatorPressed && !equalsPressed && num1.length < MAX_LENGTH) {
+                console.log("num 1 before operator");
                 storeNum1(num);
             }
             // Entering num2 after hitting operator before hitting equals.
             else if (!equalsPressed && operatorPressed && num2.length < MAX_LENGTH) {
+                console.log("num 2 after operator before equals");
                 storeNum2(num);
                 resetOperatorColors();
             }
             // Entering num1 after hitting equals.
             else if (equalsPressed && !operatorPressed && num1.length < MAX_LENGTH) {
+                console.log("num 1 after equals before operator");  
                 if (num != "+/-") {
                     clear(); 
                 }
@@ -178,6 +182,7 @@ function addNumberListeners() {
             }
             // Entering num2 after hitting equals.
             else if (equalsPressed && operatorPressed && num2.length < MAX_LENGTH) {
+              console.log("num 2 after equals after operator");
                 storeNumAfterEquals(num);
                 resetOperatorColors();
             }
@@ -223,7 +228,7 @@ function addEqualsListener() {
 
             let err = checkErr();
             if (!err) {
-            num1 = Math.round(num1 * 1e15) / 1e15;
+            num1 = String(Math.round(num1 * 1e15) / 1e15);
             updateDisplay(num1);
             operatorPressed = false;
             lastOperator = operator;
