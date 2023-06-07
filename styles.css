@@ -52,12 +52,11 @@ body {
 #equals {
     grid-column: 3 /5;
     grid-row: 6 / 7;
-    font-size: 40px;
     color: whitesmoke;
-}
 
-#minus {
-    font-size: 40px;
+
+.adjust-font-size {
+  font-size: 40px;
 }
 
 .operator {
