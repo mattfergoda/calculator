@@ -53,7 +53,7 @@ body {
     grid-column: 3 /5;
     grid-row: 6 / 7;
     color: whitesmoke;
-
+}
 
 .adjust-font-size {
   font-size: 40px;
